@@ -1,6 +1,7 @@
 """
-LLM Provider Factory and Manager
+LLM Provider Factory and Manager (2025)
 Centralized management for all LLM providers
+Supports: OpenAI, Anthropic, Google Gemini, Grok
 """
 from typing import Dict, Optional, Type, List
 from enum import Enum
@@ -9,22 +10,25 @@ from .base import BaseLLMProvider
 from .openai_provider import OpenAIProvider
 from .anthropic_provider import AnthropicProvider
 from .grok_provider import GrokProvider
+from .gemini_provider import GeminiProvider
 
 
 class ProviderType(str, Enum):
-    """Supported LLM provider types"""
+    """Supported LLM provider types (2025)"""
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
     GROK = "grok"
+    GEMINI = "gemini"
 
 
 class LLMProviderFactory:
-    """Factory for creating LLM provider instances"""
+    """Factory for creating LLM provider instances (2025)"""
 
     _providers: Dict[ProviderType, Type[BaseLLMProvider]] = {
         ProviderType.OPENAI: OpenAIProvider,
         ProviderType.ANTHROPIC: AnthropicProvider,
         ProviderType.GROK: GrokProvider,
+        ProviderType.GEMINI: GeminiProvider,
     }
 
     @classmethod
@@ -246,3 +250,15 @@ def initialize_providers_from_config(config: Dict[str, any]):
             )
         except Exception as e:
             print(f"Failed to initialize Grok provider: {e}")
+
+    # Add Gemini if configured
+    if config.get("GEMINI_API_KEY"):
+        try:
+            manager.add_provider(
+                name="gemini",
+                provider_type=ProviderType.GEMINI,
+                api_key=config["GEMINI_API_KEY"],
+                set_as_default=not manager.get_default_provider_name()
+            )
+        except Exception as e:
+            print(f"Failed to initialize Gemini provider: {e}")

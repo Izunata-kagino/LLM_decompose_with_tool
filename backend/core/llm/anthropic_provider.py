@@ -1,6 +1,8 @@
 """
-Anthropic/Claude provider implementation
-Supports: Claude 3 Opus, Sonnet, Haiku with tool calling and structured output
+Anthropic/Claude provider implementation (2025)
+Supports: Claude 4.x series - Sonnet 4.5, Haiku 4.5, Opus 4.1
+Knowledge cutoff: January 2025 (most extensive), July 2025 (Sonnet 4.5 trained on)
+Context window: Up to 1M tokens with context-1m-2025-08-07 header
 """
 from typing import AsyncIterator, List, Optional
 import json
@@ -18,10 +20,22 @@ from models.llm_models import (
 
 
 class AnthropicProvider(BaseLLMProvider):
-    """Anthropic provider for Claude models"""
+    """Anthropic provider for Claude models (2025)"""
 
     DEFAULT_BASE_URL = "https://api.anthropic.com/v1"
     SUPPORTED_MODELS = [
+        # Claude 4.5 Series (2025) - Latest flagship models
+        "claude-sonnet-4-5",        # September 2025 - Best coding model, $3/$15 per 1M tokens
+        "claude-haiku-4-5",         # October 2025 - Fast and economical, $1/$5 per 1M tokens
+
+        # Claude 4.1 Series (2025)
+        "claude-opus-4-1",          # August 2025 - Agentic tasks, $15/$75 per 1M tokens
+
+        # Claude 4 Series (May 2025)
+        "claude-sonnet-4",
+        "claude-opus-4",
+
+        # Legacy Claude 3.x models (still available)
         "claude-3-opus-20240229",
         "claude-3-sonnet-20240229",
         "claude-3-haiku-20240307",

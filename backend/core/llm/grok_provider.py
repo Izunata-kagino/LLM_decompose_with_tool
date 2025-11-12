@@ -1,6 +1,8 @@
 """
-Grok (X.AI) provider implementation
-Supports: Grok models with tool calling and structured output
+Grok (X.AI) provider implementation (2025)
+Supports: Grok 4, Grok 3 series with native tool use and real-time search
+Knowledge cutoff: November 2024 (with Live Search for real-time data)
+Context window: 256K tokens (Grok 4)
 Based on OpenAI-compatible API
 """
 from typing import AsyncIterator, List, Optional
@@ -19,13 +21,26 @@ from models.llm_models import (
 
 
 class GrokProvider(BaseLLMProvider):
-    """Grok provider for X.AI models"""
+    """Grok provider for X.AI models (2025)"""
 
     DEFAULT_BASE_URL = "https://api.x.ai/v1"
     SUPPORTED_MODELS = [
-        "grok-beta",
-        "grok-1",
+        # Grok 4 (2025) - Most intelligent model, 256K context
+        "grok-4",
+        "grok-4-0709",
+
+        # Grok 3 Series (2025)
+        "grok-3",
+        "grok-3-mini",              # Lightweight reasoning model
+
+        # Specialized models
+        "grok-code-fast-1",         # Fast agentic coding model
+        "grok-2-image",             # Image generation
+
+        # Legacy
         "grok-2",
+        "grok-1",
+        "grok-beta",
     ]
 
     def __init__(self, api_key: str, base_url: Optional[str] = None, timeout: int = 120):

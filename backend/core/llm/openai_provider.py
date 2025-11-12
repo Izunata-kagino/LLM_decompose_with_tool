@@ -1,6 +1,7 @@
 """
-OpenAI/GPT provider implementation
-Supports: GPT-4, GPT-4-Turbo, GPT-3.5, with structured output and tool calling
+OpenAI/GPT provider implementation (2025)
+Supports: GPT-5, GPT-4.1 series, O-series reasoning models
+Knowledge cutoff: June 2024 (GPT-4.1), varies by model
 """
 from typing import AsyncIterator, List, Optional
 import json
@@ -18,18 +19,31 @@ from models.llm_models import (
 
 
 class OpenAIProvider(BaseLLMProvider):
-    """OpenAI provider for GPT models"""
+    """OpenAI provider for GPT models (2025)"""
 
     DEFAULT_BASE_URL = "https://api.openai.com/v1"
     SUPPORTED_MODELS = [
-        "gpt-4-turbo-preview",
-        "gpt-4-1106-preview",
-        "gpt-4",
-        "gpt-4-0613",
-        "gpt-3.5-turbo",
-        "gpt-3.5-turbo-1106",
+        # GPT-5 (August 2025) - Most advanced model
+        "gpt-5",
+
+        # GPT-4.1 Series (2025) - 1M context window, June 2024 knowledge
+        "gpt-4.1",
+        "gpt-4.1-mini",
+        "gpt-4.1-nano",
+
+        # O-Series Reasoning Models (2025)
+        "o3",
+        "o4-mini",
+        "o4-mini-high",
+
+        # GPT-4o (Legacy but still functional)
         "gpt-4o",
         "gpt-4o-mini",
+
+        # Older models (still available)
+        "gpt-4-turbo",
+        "gpt-4",
+        "gpt-3.5-turbo",
     ]
 
     def __init__(self, api_key: str, base_url: Optional[str] = None, timeout: int = 120):
@@ -137,8 +151,9 @@ class OpenAIProvider(BaseLLMProvider):
 
         # Handle structured output (using response_format for JSON mode)
         if request.structured_output:
-            # For OpenAI, we use response_format with json_schema (GPT-4+ feature)
-            if "gpt-4" in request.model.lower() or "gpt-4o" in request.model.lower():
+            # All modern models (GPT-5, GPT-4.1, O-series, GPT-4) support json_schema
+            model_lower = request.model.lower()
+            if any(x in model_lower for x in ["gpt-5", "gpt-4", "o3", "o4"]):
                 payload["response_format"] = {
                     "type": "json_schema",
                     "json_schema": {

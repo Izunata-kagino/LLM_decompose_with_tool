@@ -28,15 +28,15 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: Optional[str] = None
 
-    # LLM API Keys
+    # LLM API Keys (2025)
     OPENAI_API_KEY: Optional[str] = None
     ANTHROPIC_API_KEY: Optional[str] = None
     GROK_API_KEY: Optional[str] = None
-    GOOGLE_API_KEY: Optional[str] = None
+    GEMINI_API_KEY: Optional[str] = None
 
-    # LLM Settings
-    DEFAULT_PROVIDER: str = "openai"  # openai, anthropic, grok
-    DEFAULT_MODEL: str = "gpt-4-turbo-preview"
+    # LLM Settings (2025)
+    DEFAULT_PROVIDER: str = "openai"  # openai, anthropic, grok, gemini
+    DEFAULT_MODEL: str = "gpt-5"
     MAX_TOKENS: int = 4096
     TEMPERATURE: float = 0.7
     ALLOW_STRUCTURED_OUTPUT: bool = True  # Allow structured output as final response

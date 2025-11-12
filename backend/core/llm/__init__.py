@@ -1,10 +1,11 @@
 """
-LLM Integration Module
+LLM Integration Module (2025)
 
 This module provides unified interface for multiple LLM providers:
-- OpenAI (GPT-4, GPT-3.5, etc.)
-- Anthropic (Claude 3 family)
-- Grok (X.AI)
+- OpenAI (GPT-5, GPT-4.1, O-series)
+- Anthropic (Claude 4.5, 4.1, 4)
+- Google Gemini (Gemini 2.5 Pro, Flash)
+- Grok (Grok 4, Grok 3)
 
 All providers support:
 - Tool calling
@@ -16,6 +17,7 @@ from .base import BaseLLMProvider
 from .openai_provider import OpenAIProvider
 from .anthropic_provider import AnthropicProvider
 from .grok_provider import GrokProvider
+from .gemini_provider import GeminiProvider
 from .provider_factory import (
     LLMProviderFactory,
     LLMProviderManager,
@@ -32,6 +34,7 @@ __all__ = [
     "OpenAIProvider",
     "AnthropicProvider",
     "GrokProvider",
+    "GeminiProvider",
 
     # Factory and Management
     "LLMProviderFactory",
