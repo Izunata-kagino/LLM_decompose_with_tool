@@ -1,0 +1,20 @@
+# Test configuration for multi-provider demo
+default_provider_id: openai_test
+providers:
+  - provider_id: openai_test
+    provider_type: openai
+    display_name: "测试 OpenAI 提供商"
+    api_key_env: OPENAI_API_KEY
+    default_model: gpt-4
+    enabled: true
+    metadata:
+      description: "Test OpenAI provider"
+
+  - provider_id: claude_test
+    provider_type: anthropic
+    display_name: "测试 Claude 提供商"
+    api_key_env: ANTHROPIC_API_KEY
+    default_model: claude-3-5-sonnet-20241022
+    enabled: true
+    metadata:
+      description: "Test Claude provider"

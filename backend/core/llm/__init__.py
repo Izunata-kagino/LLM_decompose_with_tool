@@ -23,7 +23,15 @@ from .provider_factory import (
     LLMProviderManager,
     ProviderType,
     get_global_manager,
-    initialize_providers_from_config
+    initialize_providers_from_config,
+    initialize_providers_from_yaml,
+    get_provider_display_names,
+)
+from .config_loader import (
+    load_llm_config,
+    LLMProvidersConfig,
+    ProviderConfig,
+    LLMConfigLoader,
 )
 
 __all__ = [
@@ -42,4 +50,12 @@ __all__ = [
     "ProviderType",
     "get_global_manager",
     "initialize_providers_from_config",
+    "initialize_providers_from_yaml",
+    "get_provider_display_names",
+
+    # Configuration
+    "load_llm_config",
+    "LLMProvidersConfig",
+    "ProviderConfig",
+    "LLMConfigLoader",
 ]

@@ -5,12 +5,15 @@ Supports: OpenAI, Anthropic, Google Gemini, Grok
 """
 from typing import Dict, Optional, Type, List
 from enum import Enum
+import logging
 
 from .base import BaseLLMProvider
 from .openai_provider import OpenAIProvider
 from .anthropic_provider import AnthropicProvider
 from .grok_provider import GrokProvider
 from .gemini_provider import GeminiProvider
+
+logger = logging.getLogger(__name__)
 
 
 class ProviderType(str, Enum):
@@ -262,3 +265,126 @@ def initialize_providers_from_config(config: Dict[str, any]):
             )
         except Exception as e:
             print(f"Failed to initialize Gemini provider: {e}")
+
+
+def initialize_providers_from_yaml(config_path: Optional[str] = None):
+    """
+    Initialize providers from YAML configuration file
+
+    This supports multiple providers with custom names.
+    Configuration file format:
+
+    ```yaml
+    default_provider_id: openai_personal
+    providers:
+      - provider_id: openai_personal
+        provider_type: openai
+        display_name: "Personal OpenAI Account"
+        api_key_env: OPENAI_PERSONAL_KEY
+        default_model: gpt-4
+        enabled: true
+
+      - provider_id: openai_work
+        provider_type: openai
+        display_name: "Work OpenAI Account"
+        api_key_env: OPENAI_WORK_KEY
+        default_model: gpt-3.5-turbo
+        enabled: true
+
+      - provider_id: claude_main
+        provider_type: anthropic
+        display_name: "Main Claude Account"
+        api_key_env: ANTHROPIC_API_KEY
+        default_model: claude-3-5-sonnet-20241022
+        enabled: true
+    ```
+
+    Args:
+        config_path: Path to YAML configuration file.
+                    If None, will search default locations.
+
+    Returns:
+        Number of providers initialized
+    """
+    from .config_loader import LLMConfigLoader
+
+    manager = get_global_manager()
+
+    # Load configuration
+    if config_path:
+        llm_config = LLMConfigLoader.load_from_file(config_path)
+    else:
+        llm_config = LLMConfigLoader.load_from_default_paths()
+        if not llm_config:
+            logger.warning("No configuration file found, using default configuration")
+            llm_config = LLMConfigLoader.create_default_config()
+
+    # Initialize providers
+    initialized_count = 0
+    for provider_config in llm_config.providers:
+        if not provider_config.enabled:
+            logger.info(f"Skipping disabled provider: {provider_config.display_name}")
+            continue
+
+        api_key = provider_config.get_api_key()
+        if not api_key:
+            logger.warning(
+                f"API key not found for {provider_config.display_name} "
+                f"(environment variable: {provider_config.api_key_env})"
+            )
+            continue
+
+        try:
+            # Convert provider type string to enum
+            provider_type = ProviderType(provider_config.provider_type)
+
+            # Add provider with custom name
+            manager.add_provider(
+                name=provider_config.provider_id,
+                provider_type=provider_type,
+                api_key=api_key,
+                base_url=provider_config.base_url,
+                set_as_default=(
+                    provider_config.provider_id == llm_config.default_provider_id
+                    or initialized_count == 0
+                )
+            )
+
+            # Set default model if specified
+            provider = manager.get_provider(provider_config.provider_id)
+            if provider_config.default_model:
+                provider.default_model = provider_config.default_model
+
+            logger.info(
+                f"Initialized provider: {provider_config.display_name} "
+                f"(ID: {provider_config.provider_id})"
+            )
+            initialized_count += 1
+
+        except Exception as e:
+            logger.error(
+                f"Failed to initialize provider {provider_config.display_name}: {e}"
+            )
+
+    if initialized_count == 0:
+        logger.warning("No providers were initialized")
+    else:
+        logger.info(f"Successfully initialized {initialized_count} provider(s)")
+
+    return initialized_count
+
+
+def get_provider_display_names() -> Dict[str, str]:
+    """
+    Get mapping of provider IDs to display names
+
+    Returns:
+        Dictionary mapping provider_id to display_name
+    """
+    from .config_loader import load_llm_config
+
+    config = load_llm_config()
+    return {
+        p.provider_id: p.display_name
+        for p in config.providers
+    }

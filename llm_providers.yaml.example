@@ -1,0 +1,165 @@
+# LLM Provider Configuration
+# This file allows you to configure multiple LLM providers with custom names
+#
+# API keys are read from environment variables for security
+# You can define multiple instances of the same provider type
+#
+# Priority order for configuration:
+#   1. ./llm_providers.yaml
+#   2. config/llm_providers.yaml
+#   3. .config/llm_providers.yaml
+#   4. Fallback to environment variables
+
+# Default provider to use when none is specified
+default_provider_id: openai_personal
+
+# List of provider configurations
+providers:
+  # Personal OpenAI Account
+  - provider_id: openai_personal
+    provider_type: openai
+    display_name: "个人 OpenAI 账户"
+    api_key_env: OPENAI_PERSONAL_KEY
+    default_model: gpt-4
+    enabled: true
+    metadata:
+      description: "My personal OpenAI account for hobby projects"
+      rate_limit: "standard"
+
+  # Work OpenAI Account
+  - provider_id: openai_work
+    provider_type: openai
+    display_name: "公司 OpenAI 账户"
+    api_key_env: OPENAI_WORK_KEY
+    default_model: gpt-3.5-turbo
+    enabled: true
+    metadata:
+      description: "Company OpenAI account for work projects"
+      rate_limit: "high"
+
+  # Main Claude Account
+  - provider_id: claude_main
+    provider_type: anthropic
+    display_name: "主 Claude 账户"
+    api_key_env: ANTHROPIC_API_KEY
+    default_model: claude-3-5-sonnet-20241022
+    enabled: true
+    metadata:
+      description: "Primary Claude account"
+
+  # Alternative Claude Account (disabled by default)
+  - provider_id: claude_alt
+    provider_type: anthropic
+    display_name: "备用 Claude 账户"
+    api_key_env: ANTHROPIC_ALT_KEY
+    default_model: claude-3-opus-20240229
+    enabled: false  # Disabled - won't be loaded
+    metadata:
+      description: "Backup Claude account"
+
+  # Google Gemini
+  - provider_id: gemini_main
+    provider_type: gemini
+    display_name: "Google Gemini"
+    api_key_env: GEMINI_API_KEY
+    default_model: gemini-pro
+    enabled: true
+
+  # Grok (X.AI)
+  - provider_id: grok_main
+    provider_type: grok
+    display_name: "Grok AI"
+    api_key_env: GROK_API_KEY
+    default_model: grok-beta
+    enabled: true
+
+  # Custom OpenAI-compatible endpoint
+  - provider_id: custom_openai
+    provider_type: openai
+    display_name: "自定义 OpenAI 兼容服务"
+    api_key_env: CUSTOM_OPENAI_KEY
+    base_url: "https://api.custom-service.com/v1"
+    default_model: gpt-3.5-turbo
+    enabled: false  # Disabled by default
+    metadata:
+      description: "Custom OpenAI-compatible API endpoint"
+
+# Configuration Notes:
+#
+# provider_id: Unique identifier for this provider instance
+#   - Must be unique across all providers
+#   - Used to reference the provider in code
+#   - Example: openai_personal, claude_work, gemini_test
+#
+# provider_type: Type of LLM provider
+#   - Supported values: openai, anthropic, gemini, grok
+#   - Multiple instances of the same type are allowed
+#
+# display_name: Human-readable name
+#   - Shown in UI and logs
+#   - Can contain Unicode characters
+#   - Example: "个人 OpenAI 账户", "Work Claude"
+#
+# api_key_env: Environment variable name for API key
+#   - API keys are NEVER stored in this file
+#   - Must be set as environment variables
+#   - Example: export OPENAI_PERSONAL_KEY="sk-..."
+#
+# default_model: Default model to use for this provider
+#   - Optional, provider will use its own default if not specified
+#   - Can be overridden per request
+#
+# base_url: Custom API endpoint (optional)
+#   - For OpenAI-compatible services
+#   - Leave empty for official APIs
+#
+# enabled: Whether to load this provider
+#   - true: Provider will be initialized if API key is available
+#   - false: Provider will be skipped
+#
+# metadata: Custom metadata (optional)
+#   - Store任意配置信息
+#   - Used for documentation or custom logic
+
+# Environment Variables Setup:
+#
+# Add these to your .env file or shell environment:
+#
+# # Personal OpenAI
+# export OPENAI_PERSONAL_KEY="sk-proj-..."
+#
+# # Work OpenAI
+# export OPENAI_WORK_KEY="sk-proj-..."
+#
+# # Claude
+# export ANTHROPIC_API_KEY="sk-ant-..."
+#
+# # Gemini
+# export GEMINI_API_KEY="AIza..."
+#
+# # Grok
+# export GROK_API_KEY="xai-..."
+
+# Usage in Code:
+#
+# # Initialize from this config file
+# from core.llm import initialize_providers_from_yaml
+# initialize_providers_from_yaml()  # Auto-detects config file
+#
+# # Or specify path
+# initialize_providers_from_yaml("path/to/llm_providers.yaml")
+#
+# # Get provider by ID
+# from core.llm import get_global_manager
+# manager = get_global_manager()
+# provider = manager.get_provider("openai_personal")
+#
+# # List all providers
+# providers = manager.list_providers()
+# for p in providers:
+#     print(f"{p['name']}: {p['provider_type']}")
+#
+# # Get display names
+# from core.llm import get_provider_display_names
+# names = get_provider_display_names()
+# print(names["openai_personal"])  # "个人 OpenAI 账户"
