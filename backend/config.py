@@ -31,12 +31,15 @@ class Settings(BaseSettings):
     # LLM API Keys
     OPENAI_API_KEY: Optional[str] = None
     ANTHROPIC_API_KEY: Optional[str] = None
+    GROK_API_KEY: Optional[str] = None
     GOOGLE_API_KEY: Optional[str] = None
 
     # LLM Settings
+    DEFAULT_PROVIDER: str = "openai"  # openai, anthropic, grok
     DEFAULT_MODEL: str = "gpt-4-turbo-preview"
     MAX_TOKENS: int = 4096
     TEMPERATURE: float = 0.7
+    ALLOW_STRUCTURED_OUTPUT: bool = True  # Allow structured output as final response
 
     # Tool Settings
     TOOL_TIMEOUT: int = 30  # seconds
